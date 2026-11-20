@@ -5,19 +5,24 @@ A web-based document management and governance platform designed to organize doc
 ## Preview
 
 ### Login Page
-<img width="1917" height="944" alt="Screenshot 2026-11-20 155904" src="https://github.com/user-attachments/assets/9bf40ecf-95cb-4f42-ae9e-9dc38cd752c4" />
+
+<img width="100%" alt="DocuGovern Login Page" src="https://github.com/user-attachments/assets/9bf40ecf-95cb-4f42-ae9e-9dc38cd752c4" />
 
 ### Dashboard
-<img width="1912" height="948" alt="Screenshot 2026-11-20 155930 - Copy" src="https://github.com/user-attachments/assets/a064e274-2a7d-486b-92df-e8b49289057e" />
+
+<img width="100%" alt="DocuGovern Dashboard" src="https://github.com/user-attachments/assets/a064e274-2a7d-486b-92df-e8b49289057e" />
 
 ### Document Repository
-<img width="1910" height="946" alt="Screenshot 2026-11-20 155950 - Copy" src="https://github.com/user-attachments/assets/beb1d591-a7fd-41d4-86e2-660decb10997" />
+
+<img width="100%" alt="DocuGovern Document Repository" src="https://github.com/user-attachments/assets/beb1d591-a7fd-41d4-86e2-660decb10997" />
 
 ### Document Upload
-<img width="1913" height="947" alt="Screenshot 2026-11-20 160007 - Copy" src="https://github.com/user-attachments/assets/ca45f90e-b2de-4233-8a05-618f17dc537d" />
+
+<img width="100%" alt="DocuGovern Document Upload" src="https://github.com/user-attachments/assets/ca45f90e-b2de-4233-8a05-618f17dc537d" />
 
 ### Approval Workflow
-<img width="1910" height="944" alt="Screenshot 2026-11-20 160034" src="https://github.com/user-attachments/assets/5127e6ef-33f4-4cff-b680-0140e124d58d" />
+
+<img width="100%" alt="DocuGovern Approval Workflow" src="https://github.com/user-attachments/assets/5127e6ef-33f4-4cff-b680-0140e124d58d" />
 
 ## Key Features
 
@@ -77,20 +82,20 @@ DocuGovern/
 - MongoDB database (local MongoDB or MongoDB Atlas)
 - Git
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/Shikshahdas/DocuGovern.git
 cd DocuGovern
 ```
 
-### 2. Install dependencies
+### 2. Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Configure environment variables
+### 3. Configure Environment Variables
 
 Create a `.env` file in the project root using `.env.example` as a template.
 
@@ -108,7 +113,7 @@ UPLOAD_PATH=public/uploads/documents
 
 **Important:** Never upload your actual `.env` file, database credentials, or JWT secrets to GitHub.
 
-### 4. Seed demonstration data (optional)
+### 4. Seed Demonstration Data (Optional)
 
 ```bash
 npm run seed
@@ -116,7 +121,7 @@ npm run seed
 
 Use this only if you want to populate your database with demonstration data. Review the seeder configuration before running it.
 
-### 5. Run the application
+### 5. Run the Application
 
 For development:
 
@@ -130,7 +135,7 @@ For production:
 npm start
 ```
 
-Open your browser at:
+Open your browser and visit:
 
 ```text
 http://localhost:3000
