@@ -1,0 +1,24 @@
+<%- include('../partials/head') %>
+
+<div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; width: 100%; padding: 2rem;">
+  <div class="card" style="max-width: 480px; width: 100%; text-align: center; padding: 2.5rem 2rem;">
+    <div style="width: 60px; height: 60px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    
+    <div style="font-size: 2.5rem; font-weight: 800; color: var(--text-main); line-height: 1;"><%= statusCode || 500 %></div>
+    <h2 style="font-size: 1.25rem; font-weight: 700; margin: 0.75rem 0 0.5rem; color: var(--text-main);"><%= title || 'System Error' %></h2>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem; line-height: 1.5;"><%= message || 'An unexpected operational situation occurred.' %></p>
+    
+    <div style="display: flex; gap: 0.75rem; justify-content: center;">
+      <a href="javascript:history.back()" class="btn btn-secondary btn-sm">Go Back</a>
+      <a href="/dashboard" class="btn btn-primary btn-sm">Return to Hub</a>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

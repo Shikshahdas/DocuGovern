@@ -1,0 +1,144 @@
+<%- include('../../partials/head') %>
+<%- include('../../partials/sidebar') %>
+
+<div class="main-wrapper">
+  <%- include('../../partials/topbar') %>
+
+  <main class="dashboard-container">
+    <div class="dashboard-welcome">
+      <div>
+        <h1 class="welcome-title">Governance Approval Queue</h1>
+        <p class="welcome-subtitle">Review, ratify, or request revisions on submitted organizational policies and records.</p>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;">
+      <a href="/approvals?status=Pending" class="btn <%= currentStatus === 'Pending' ? 'btn-primary' : 'btn-secondary' %> btn-sm">
+        Pending Reviews
+      </a>
+      <a href="/approvals?status=Approved" class="btn <%= currentStatus === 'Approved' ? 'btn-primary' : 'btn-secondary' %> btn-sm">
+        Ratified & Approved
+      </a>
+      <a href="/approvals?status=Rejected" class="btn <%= currentStatus === 'Rejected' ? 'btn-primary' : 'btn-secondary' %> btn-sm">
+        Rejected / Revisions
+      </a>
+      <a href="/approvals?status=all" class="btn <%= currentStatus === 'all' ? 'btn-primary' : 'btn-secondary' %> btn-sm">
+        All Submissions
+      </a>
+    </div>
+
+    <!-- Approvals List -->
+    <div class="card">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Target Document</th>
+              <th>Category</th>
+              <th>Priority</th>
+              <th>Submitted By</th>
+              <th>Submission Date</th>
+              <th>Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (approvals && approvals.length > 0) { %>
+              <% approvals.forEach(app => { %>
+                <tr>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-main);">
+                      <%= app.document ? app.document.title : 'Document' %>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;">
+                      <%= app.document ? app.document.documentNumber : 'DOC-UNKNOWN' %> • v<%= app.document ? app.document.currentVersion : '1.0' %>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: <%= app.document && app.document.category && app.document.category.color ? app.document.category.color + '15' : '#e0e7ff' %>; color: <%= app.document && app.document.category ? app.document.category.color : '#4f46e5' %>;">
+                      <%= app.document && app.document.category ? app.document.category.name : 'General' %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge priority-<%= (app.priority || 'Normal').toLowerCase() %>">
+                      <%= app.priority || 'Normal' %>
+                    </span>
+                  </td>
+                  <td>
+                    <div style="font-weight: 500;"><%= app.submittedBy ? app.submittedBy.name : 'Author' %></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);"><%= app.submittedBy ? app.submittedBy.department : 'General' %></div>
+                  </td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">
+                    <%= formatDate(app.createdAt) %>
+                  </td>
+                  <td>
+                    <% if (app.status === 'Approved') { %>
+                      <span class="badge badge-approved"><span class="badge-dot"></span>Approved</span>
+                    <% } else if (app.status === 'Rejected') { %>
+                      <span class="badge badge-rejected"><span class="badge-dot"></span>Rejected</span>
+                    <% } else { %>
+                      <span class="badge badge-pending"><span class="badge-dot"></span>Pending</span>
+                    <% } %>
+                  </td>
+                  <td style="text-align: right;">
+                    <% if (app.status === 'Pending' && (currentUser.role === 'Admin' || currentUser.role === 'Approver')) { %>
+                      <button 
+                        class="btn btn-primary btn-sm"
+                        data-id="<%= app._id %>"
+                        data-title="<%= app.document ? app.document.title : 'Document' %>"
+                        data-submitter="<%= app.submittedBy ? app.submittedBy.name : '' %>"
+                        onclick="openApprovalModal(this.dataset.id, this.dataset.title, this.dataset.submitter)"
+                      >
+                        Review
+                      </button>
+                    <% } else { %>
+                      <a href="/documents/<%= app.document ? app.document._id : '#' %>" class="btn btn-secondary btn-sm">Inspect</a>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                  No items matching the selected queue filter.
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Quick Review Modal -->
+<div class="modal-backdrop" id="quickApprovalModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3 class="modal-title">Sign-off Decision</h3>
+      <button class="modal-close" data-dismiss="modal">&times;</button>
+    </div>
+    <form id="quickApprovalForm" method="POST" action="">
+      <div class="modal-body">
+        <div style="margin-bottom: 1rem; padding: 1rem; background-color: var(--bg-surface-subtle); border-radius: var(--radius-md);">
+          <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Document</div>
+          <div id="modalDocTitle" style="font-weight: 600; font-size: 0.95rem; color: var(--text-main); margin-top: 2px;"></div>
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Author: <span id="modalSubmitter" style="font-weight: 600;"></span></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Review Assessment / Audit Feedback</label>
+          <textarea name="feedback" class="form-control" placeholder="Provide justification or required amendments..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+        <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject / Request Changes</button>
+        <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve Document</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

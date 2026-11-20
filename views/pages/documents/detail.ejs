@@ -1,0 +1,331 @@
+<%- include('../../partials/head') %>
+<%- include('../../partials/sidebar') %>
+
+<div class="main-wrapper">
+  <%- include('../../partials/topbar') %>
+
+  <main class="dashboard-container">
+    <div style="margin-bottom: 1.5rem;">
+      <a href="/documents" style="display: inline-flex; align-items: center; gap: 0.4rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 600;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <span>Back to Repository</span>
+      </a>
+    </div>
+
+    <!-- Document Header Banner -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-body" style="padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+              <span class="version-pill" style="font-size: 0.85rem; padding: 2px 8px;">v<%= document.currentVersion %></span>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-muted);"><%= document.documentNumber %></span>
+              
+              <% if (document.status === 'Approved') { %>
+                <span class="badge badge-approved"><span class="badge-dot"></span>Ratified & Approved</span>
+              <% } else if (document.status === 'Pending_Approval') { %>
+                <span class="badge badge-pending"><span class="badge-dot"></span>Pending Executive Sign-off</span>
+              <% } else if (document.status === 'Rejected') { %>
+                <span class="badge badge-rejected"><span class="badge-dot"></span>Revision Required / Rejected</span>
+              <% } else { %>
+                <span class="badge badge-draft"><span class="badge-dot"></span>Draft</span>
+              <% } %>
+            </div>
+
+            <h1 style="font-size: 1.65rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; letter-spacing: -0.02em;">
+              <%= document.title %>
+            </h1>
+
+            <div style="display: flex; align-items: center; gap: 1.25rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap;">
+              <span>Category: <strong><%= document.category ? document.category.name : 'General' %></strong></span>
+              <span>•</span>
+              <span>Author: <strong><%= document.uploadedBy ? document.uploadedBy.name : 'Author' %></strong> (<%= document.uploadedBy ? document.uploadedBy.department : 'General' %>)</span>
+              <span>•</span>
+              <span>Last Modified: <%= formatDate(document.updatedAt) %></span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <a href="<%= document.fileUrl %>" download class="btn btn-secondary btn-sm" target="_blank">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download File (<%= formatBytes(document.fileSize) %>)</span>
+            </a>
+
+            <button class="btn btn-secondary btn-sm" onclick="openModal('newVersionModal')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg>
+              <span>Upload New Version</span>
+            </button>
+
+            <% if (document.status === 'Draft' || document.status === 'Rejected') { %>
+              <button class="btn btn-primary btn-sm" onclick="openModal('submitApprovalModal')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Submit for Approval</span>
+              </button>
+            <% } %>
+          </div>
+        </div>
+
+        <% if (document.description) { %>
+          <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color); font-size: 0.92rem; color: var(--text-main); line-height: 1.6;">
+            <strong>Scope & Summary:</strong> <%= document.description %>
+          </div>
+        <% } %>
+
+        <% if (document.tags && document.tags.length > 0) { %>
+          <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+            <% document.tags.forEach(tag => { %>
+              <span style="font-size: 0.75rem; background: #f1f5f9; padding: 2px 8px; border-radius: var(--radius-sm); color: #475569;">#<%= tag %></span>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Active Governance Status Callout -->
+    <% if (document.status === 'Pending_Approval' && (currentUser.role === 'Admin' || currentUser.role === 'Approver')) { %>
+      <div class="card" style="border-left: 4px solid var(--amber-500); margin-bottom: 2rem;">
+        <div class="card-body" style="padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.2rem;">
+              Executive Sign-off Required
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              This document is pending your regulatory evaluation and sign-off.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.75rem;">
+            <% if (approvals && approvals.length > 0) { %>
+              <button 
+                class="btn btn-danger btn-sm" 
+                data-id="<%= approvals[0]._id %>" 
+                data-title="<%= document.title %>" 
+                data-submitter="<%= document.uploadedBy ? document.uploadedBy.name : '' %>"
+                onclick="openApprovalModal(this.dataset.id, this.dataset.title, this.dataset.submitter)"
+              >
+                Reject / Amend
+              </button>
+              <button 
+                class="btn btn-success btn-sm" 
+                data-id="<%= approvals[0]._id %>" 
+                data-title="<%= document.title %>" 
+                data-submitter="<%= document.uploadedBy ? document.uploadedBy.name : '' %>"
+                onclick="openApprovalModal(this.dataset.id, this.dataset.title, this.dataset.submitter)"
+              >
+                Approve & Ratify
+              </button>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- Version History & Audit Trail -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">Version History & Change Log</h3>
+          <p class="card-subtitle">Complete chronological record of all document revisions</p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Version</th>
+              <th>Change Summary</th>
+              <th>Uploaded By</th>
+              <th>File Size</th>
+              <th>Timestamp</th>
+              <th style="text-align: right;">Download</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (document.versions && document.versions.length > 0) { %>
+              <% document.versions.slice().reverse().forEach((ver, index) => { %>
+                <tr>
+                  <td>
+                    <span class="version-pill" style="<%= index === 0 ? 'background: #eef2ff; color: #4f46e5; border-color: #c7d2fe;' : '' %>">
+                      v<%= ver.version %> <%= index === 0 ? '(Current)' : '' %>
+                    </span>
+                  </td>
+                  <td>
+                    <div style="font-weight: 600; color: var(--text-main);"><%= ver.changeSummary || 'Iterative Revision' %></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;"><%= ver.originalName %></div>
+                  </td>
+                  <td>
+                    <%= ver.uploadedBy ? ver.uploadedBy.name : 'System' %>
+                  </td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">
+                    <%= formatBytes(ver.fileSize) %>
+                  </td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">
+                    <%= formatDate(ver.uploadedAt) %>
+                  </td>
+                  <td style="text-align: right;">
+                    <a href="<%= ver.fileUrl %>" download class="btn btn-secondary btn-sm" target="_blank" style="padding: 0.25rem 0.6rem;">
+                      Get File
+                    </a>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                  Initial version 1.0 active.
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Governance Approval History Logs -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3 class="card-title">Governance Review Records</h3>
+          <p class="card-subtitle">Audited decision log from compliance officers</p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <% if (approvals && approvals.length > 0) { %>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <% approvals.forEach(app => { %>
+              <div style="padding: 1.25rem; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #f8fafc;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <% if (app.status === 'Approved') { %>
+                      <span class="badge badge-approved">Approved</span>
+                    <% } else if (app.status === 'Rejected') { %>
+                      <span class="badge badge-rejected">Rejected</span>
+                    <% } else { %>
+                      <span class="badge badge-pending">Pending Review</span>
+                    <% } %>
+                    <span style="font-weight: 600; font-size: 0.9rem;">Requested by <%= app.submittedBy ? app.submittedBy.name : 'Author' %></span>
+                  </div>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);"><%= formatDate(app.createdAt) %></span>
+                </div>
+
+                <% if (app.notes) { %>
+                  <div style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 0.5rem;">
+                    <strong>Submitter Notes:</strong> <%= app.notes %>
+                  </div>
+                <% } %>
+
+                <% if (app.feedback) { %>
+                  <div style="font-size: 0.85rem; color: var(--text-main); background: #ffffff; padding: 0.75rem; border-radius: var(--radius-sm); border-left: 3px solid <%= app.status === 'Approved' ? 'var(--emerald-500)' : 'var(--rose-500)' %>;">
+                    <strong>Reviewer Feedback (<%= app.reviewedBy ? app.reviewedBy.name : 'Governance Officer' %>):</strong> <%= app.feedback %>
+                  </div>
+                <% } %>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            No formal review cycles have been initiated for this document yet.
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Modal: Upload New Version -->
+<div class="modal-backdrop" id="newVersionModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3 class="modal-title">Publish New Version Revision</h3>
+      <button class="modal-close" data-dismiss="modal">&times;</button>
+    </div>
+    <form action="/documents/<%= document._id %>/new-version" method="POST" enctype="multipart/form-data">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Attach Revised Document File *</label>
+          <input type="file" name="file" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Version Number (Optional, auto-increments if empty)</label>
+          <input type="text" name="version" class="form-control" placeholder="e.g. <%= (parseFloat(document.currentVersion || '1.0') + 0.1).toFixed(1) %>">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Change Log / Summary of Amendments *</label>
+          <textarea name="changeSummary" class="form-control" placeholder="Summarize changes made since v<%= document.currentVersion %>..." required rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Upload & Publish Version</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: Submit For Approval -->
+<div class="modal-backdrop" id="submitApprovalModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3 class="modal-title">Initiate Governance Approval Request</h3>
+      <button class="modal-close" data-dismiss="modal">&times;</button>
+    </div>
+    <form action="/documents/<%= document._id %>/submit-approval" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Designate Regulatory Approver *</label>
+          <select name="approverId" class="form-control" required>
+            <% approvers.forEach(app => { %>
+              <option value="<%= app._id %>"><%= app.name %> (<%= app.role %> - <%= app.department %>)</option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Priority Level</label>
+          <select name="priority" class="form-control">
+            <option value="Normal">Normal</option>
+            <option value="High">High</option>
+            <option value="Urgent">Urgent</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Submission Context / Justification</label>
+          <textarea name="notes" class="form-control" placeholder="Explain the context and timeline for this sign-off request..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm">Submit Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Quick Review Modal -->
+<div class="modal-backdrop" id="quickApprovalModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h3 class="modal-title">Review Document</h3>
+      <button class="modal-close" data-dismiss="modal">&times;</button>
+    </div>
+    <form id="quickApprovalForm" method="POST" action="">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Audit Feedback / Review Comments</label>
+          <textarea name="feedback" class="form-control" placeholder="Add justification, conditions of acceptance, or amendment guidance..." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+        <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm">Reject / Request Changes</button>
+        <button type="submit" name="action" value="approve" class="btn btn-success btn-sm">Approve Document</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

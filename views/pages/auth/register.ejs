@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Register - DocuGovern' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    body {
+      background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+    .auth-card {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 480px;
+      padding: 2.5rem 2.25rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <div class="brand-logo" style="justify-content: center; color: var(--text-main); margin-bottom: 0.5rem;">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+        </div>
+        <span>DocuGovern</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.88rem;">Create your enterprise user profile</p>
+    </div>
+
+    <% if (error) { %>
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/register" method="POST">
+      <div class="form-group">
+        <label class="form-label" for="name">Full Name</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Rachel Adams" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Work Email</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="rachel.adams@company.com" required>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="department">Department</label>
+        <select name="department" id="department" class="form-control">
+          <option value="Executive Governance">Executive Governance</option>
+          <option value="Compliance & Legal">Compliance & Legal</option>
+          <option value="Finance & Accounting">Finance & Accounting</option>
+          <option value="IT & Security">IT & Security</option>
+          <option value="Human Resources">Human Resources</option>
+          <option value="Operations">Operations</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Create Secure Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="At least 6 characters" minlength="6" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.8rem;">
+        Complete Registration
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+      Already have an account? 
+      <a href="/login" style="color: var(--primary-600); font-weight: 600;">Sign In</a>
+    </div>
+  </div>
+
+</body>
+</html>

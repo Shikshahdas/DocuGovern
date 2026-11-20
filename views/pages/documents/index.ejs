@@ -1,0 +1,153 @@
+<%- include('../../partials/head') %>
+<%- include('../../partials/sidebar') %>
+
+<div class="main-wrapper">
+  <%- include('../../partials/topbar') %>
+
+  <main class="dashboard-container">
+    <div class="dashboard-welcome">
+      <div>
+        <h1 class="welcome-title">Document Repository</h1>
+        <p class="welcome-subtitle">Search, filter, and access all organisation documents, policies, and records.</p>
+      </div>
+
+      <div class="dashboard-actions">
+        <a href="/documents/upload" class="btn btn-primary btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Upload Document</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Filter and Search Toolbar -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+      <div class="card-body" style="padding: 1.25rem;">
+        <form action="/documents" method="GET" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Search Query</label>
+            <input 
+              type="text" 
+              name="search" 
+              class="form-control" 
+              placeholder="Title, document code, tags..." 
+              value="<%= filters.search %>"
+            >
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-control">
+              <option value="all">All Categories</option>
+              <% categories.forEach(cat => { %>
+                <option value="<%= cat._id %>" <%= filters.category == cat._id ? 'selected' : '' %>><%= cat.name %></option>
+              <% }) %>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-control">
+              <option value="all" <%= filters.status === 'all' ? 'selected' : '' %>>All Statuses</option>
+              <option value="Draft" <%= filters.status === 'Draft' ? 'selected' : '' %>>Draft</option>
+              <option value="Pending_Approval" <%= filters.status === 'Pending_Approval' ? 'selected' : '' %>>Pending Review</option>
+              <option value="Approved" <%= filters.status === 'Approved' ? 'selected' : '' %>>Approved</option>
+              <option value="Rejected" <%= filters.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Sort By</label>
+            <select name="sort" class="form-control">
+              <option value="newest" <%= filters.sort === 'newest' ? 'selected' : '' %>>Recently Updated</option>
+              <option value="oldest" <%= filters.sort === 'oldest' ? 'selected' : '' %>>Oldest First</option>
+              <option value="title" <%= filters.sort === 'title' ? 'selected' : '' %>>Title (A-Z)</option>
+            </select>
+          </div>
+
+          <div>
+            <button type="submit" class="btn btn-secondary" style="height: 42px;">Apply Filter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Documents Data Table -->
+    <div class="card">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Document Details</th>
+              <th>Category</th>
+              <th>Version</th>
+              <th>Owner & Department</th>
+              <th>Status</th>
+              <th>Updated</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (documents && documents.length > 0) { %>
+              <% documents.forEach(doc => { %>
+                <tr>
+                  <td>
+                    <div class="doc-cell-main">
+                      <div class="doc-type-icon">
+                        <%= (doc.mimeType && doc.mimeType.includes('pdf')) ? 'PDF' : 'DOC' %>
+                      </div>
+                      <div>
+                        <a href="/documents/<%= doc._id %>" class="doc-name"><%= doc.title %></a>
+                        <div class="doc-code"><%= doc.documentNumber %> • <%= formatBytes(doc.fileSize) %></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge" style="background: <%= doc.category && doc.category.color ? doc.category.color + '15' : '#e0e7ff' %>; color: <%= doc.category ? doc.category.color : '#4f46e5' %>; border: 1px solid <%= doc.category ? doc.category.color + '30' : '#c7d2fe' %>;">
+                      <%= doc.category ? doc.category.name : 'General' %>
+                    </span>
+                  </td>
+                  <td>
+                    <span class="version-pill">v<%= doc.currentVersion %></span>
+                  </td>
+                  <td>
+                    <div style="font-weight: 500;"><%= doc.uploadedBy ? doc.uploadedBy.name : 'Author' %></div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);"><%= doc.uploadedBy ? doc.uploadedBy.department : 'Operations' %></div>
+                  </td>
+                  <td>
+                    <% if (doc.status === 'Approved') { %>
+                      <span class="badge badge-approved"><span class="badge-dot"></span>Approved</span>
+                    <% } else if (doc.status === 'Pending_Approval') { %>
+                      <span class="badge badge-pending"><span class="badge-dot"></span>Pending</span>
+                    <% } else if (doc.status === 'Rejected') { %>
+                      <span class="badge badge-rejected"><span class="badge-dot"></span>Rejected</span>
+                    <% } else { %>
+                      <span class="badge badge-draft"><span class="badge-dot"></span>Draft</span>
+                    <% } %>
+                  </td>
+                  <td style="color: var(--text-muted); font-size: 0.82rem;">
+                    <%= formatDate(doc.updatedAt) %>
+                  </td>
+                  <td style="text-align: right;">
+                    <a href="/documents/<%= doc._id %>" class="btn btn-secondary btn-sm">Inspect</a>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                  <div style="font-weight: 600; font-size: 1rem; margin-bottom: 0.25rem;">No documents found</div>
+                  <div>Try refining your search filter or upload a new document to the repository.</div>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include('../../partials/footer') %>

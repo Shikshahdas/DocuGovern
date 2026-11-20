@@ -1,0 +1,88 @@
+<%- include('../../partials/head') %>
+<%- include('../../partials/sidebar') %>
+
+<div class="main-wrapper">
+  <%- include('../../partials/topbar') %>
+
+  <main class="dashboard-container">
+    <div class="dashboard-welcome">
+      <div>
+        <h1 class="welcome-title">User Permissions & Roles</h1>
+        <p class="welcome-subtitle">Manage system users, access tiers, and document approval rights.</p>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User Name & Profile</th>
+              <th>Department</th>
+              <th>System Role</th>
+              <th>Status</th>
+              <th>Member Since</th>
+              <th style="text-align: right;">Role Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (users && users.length > 0) { %>
+              <% users.forEach(u => { %>
+                <tr>
+                  <td>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <div class="user-avatar" style="width: 34px; height: 34px; font-size: 0.85rem;">
+                        <%= u.name.charAt(0).toUpperCase() %>
+                      </div>
+                      <div>
+                        <div style="font-weight: 600; color: var(--text-main);"><%= u.name %></div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);"><%= u.email %></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><%= u.department || 'General' %></td>
+                  <td>
+                    <span class="user-role-badge" style="font-size: 0.75rem; padding: 2px 8px;">
+                      <%= u.role %>
+                    </span>
+                  </td>
+                  <td>
+                    <% if (u.isActive) { %>
+                      <span class="badge badge-approved"><span class="badge-dot"></span>Active</span>
+                    <% } else { %>
+                      <span class="badge badge-rejected"><span class="badge-dot"></span>Inactive</span>
+                    <% } %>
+                  </td>
+                  <td style="color: var(--text-muted); font-size: 0.8rem;">
+                    <%= formatDate(u.createdAt) %>
+                  </td>
+                  <td style="text-align: right;">
+                    <form action="/users/<%= u._id %>/role" method="POST" style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                      <select name="role" class="form-control" style="padding: 0.25rem 0.5rem; font-size: 0.78rem; width: 110px;">
+                        <option value="Staff" <%= u.role === 'Staff' ? 'selected' : '' %>>Staff</option>
+                        <option value="Approver" <%= u.role === 'Approver' ? 'selected' : '' %>>Approver</option>
+                        <option value="Admin" <%= u.role === 'Admin' ? 'selected' : '' %>>Admin</option>
+                      </select>
+                      <button type="submit" class="btn btn-secondary btn-sm" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
+                        Update
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                  No user records found.
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include('../../partials/footer') %>

@@ -1,0 +1,135 @@
+<%- include('../../partials/head') %>
+<%- include('../../partials/sidebar') %>
+
+<div class="main-wrapper">
+  <%- include('../../partials/topbar') %>
+
+  <main class="dashboard-container">
+    <div class="dashboard-welcome">
+      <div>
+        <h1 class="welcome-title">Upload New Governance Document</h1>
+        <p class="welcome-subtitle">Register a new policy, agreement, or operational document into the system.</p>
+      </div>
+    </div>
+
+    <% if (error) { %>
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; padding: 0.85rem 1.25rem; border-radius: var(--radius-md); font-size: 0.9rem; margin-bottom: 1.5rem;">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <div class="card" style="max-width: 900px; margin: 0 auto;">
+      <div class="card-body" style="padding: 2.25rem;">
+        <form action="/documents/upload" method="POST" enctype="multipart/form-data">
+          
+          <!-- File Drop Zone -->
+          <div class="form-group">
+            <label class="form-label">Attach File Document *</label>
+            <div 
+              style="border: 2px dashed #cbd5e1; border-radius: var(--radius-lg); padding: 2.5rem 1.5rem; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s ease;"
+              onclick="document.getElementById('fileInput').click()"
+              id="dropZone"
+            >
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.8" style="margin-bottom: 0.75rem;">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">Click to select or drag and drop file here</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Supported formats: PDF, DOCX, XLSX, PPTX, TXT, PNG, JPG (Max 25MB)</div>
+              <div id="fileSelectedName" style="margin-top: 0.85rem; font-weight: 600; color: var(--primary-600); font-size: 0.88rem; display: none;"></div>
+            </div>
+            <input 
+              type="file" 
+              name="file" 
+              id="fileInput" 
+              style="display: none;" 
+              required
+              onchange="if(this.files[0]){ const nameBox = document.getElementById('fileSelectedName'); nameBox.style.display='block'; nameBox.textContent = 'Selected: ' + this.files[0].name + ' (' + (this.files[0].size/1024/1024).toFixed(2) + ' MB)'; }"
+            >
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="title">Document Title *</label>
+              <input type="text" name="title" id="title" class="form-control" placeholder="e.g. Q4 2026 Enterprise Risk Assessment Policy" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="category">Category *</label>
+              <select name="category" id="category" class="form-control" required>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat._id %>"><%= cat.name %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="description">Executive Summary / Scope Description</label>
+            <textarea name="description" id="description" class="form-control" placeholder="Provide background context, regulatory basis, or intended audience..."></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="priority">Document Governance Priority</label>
+              <select name="priority" id="priority" class="form-control">
+                <option value="Normal">Normal</option>
+                <option value="Low">Low</option>
+                <option value="High">High</option>
+                <option value="Urgent">Urgent</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="tags">Keywords / Index Tags</label>
+              <input type="text" name="tags" id="tags" class="form-control" placeholder="e.g. ISO-27001, Security, Audit (comma separated)">
+            </div>
+          </div>
+
+          <!-- Immediate Approval Submission Section -->
+          <div style="margin-top: 1.5rem; padding: 1.5rem; background-color: var(--bg-surface-subtle); border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem;">
+              <input 
+                type="checkbox" 
+                name="autoSubmit" 
+                value="true" 
+                id="autoSubmitToggle"
+                style="width: 17px; height: 17px; accent-color: var(--primary-600); cursor: pointer;"
+                onchange="document.getElementById('approvalConfigSection').style.display = this.checked ? 'block' : 'none';"
+              >
+              <label for="autoSubmitToggle" style="font-weight: 700; color: var(--text-main); font-size: 0.9rem; cursor: pointer;">
+                Submit for Governance Approval immediately upon upload
+              </label>
+            </div>
+
+            <div id="approvalConfigSection" style="display: none; padding-top: 0.5rem;">
+              <div class="form-group">
+                <label class="form-label">Assign Approver / Regulatory Authority</label>
+                <select name="approverId" class="form-control">
+                  <% approvers.forEach(app => { %>
+                    <option value="<%= app._id %>"><%= app.name %> (<%= app.role %> - <%= app.department %>)</option>
+                  <% }) %>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label">Submission Notes / Review Instructions</label>
+                <textarea name="notes" class="form-control" placeholder="Explain the rationale for this sign-off request..." rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+            <a href="/documents" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary" style="padding-left: 2rem; padding-right: 2rem;">
+              Upload & Save Document
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<%- include('../../partials/footer') %>

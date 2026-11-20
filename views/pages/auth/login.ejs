@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'Sign In - DocuGovern' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <style>
+    body {
+      background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+    .auth-card {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+      width: 100%;
+      max-width: 440px;
+      padding: 2.5rem 2.25rem;
+    }
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .auth-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+    .demo-credentials-box {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="auth-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13" stroke="white" stroke-width="2"></line>
+            <line x1="16" y1="17" x2="8" y2="17" stroke="white" stroke-width="2"></line>
+          </svg>
+        </div>
+        <span>DocuGovern</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.88rem;">Sign in to your organisation's governance portal</p>
+    </div>
+
+    <% if (error) { %>
+      <div style="background: #fff1f2; border: 1px solid #fecdd3; color: #e11d48; padding: 0.75rem 1rem; border-radius: var(--radius-md); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/login" method="POST">
+      <input type="hidden" name="redirect" value="<%= redirect %>">
+
+      <div class="form-group">
+        <label class="form-label" for="email">Work Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email" 
+          class="form-control" 
+          placeholder="name@company.com" 
+          required 
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+          <label class="form-label" for="password" style="margin-bottom: 0;">Password</label>
+          <a href="#" style="font-size: 0.78rem; color: var(--primary-600); font-weight: 600;">Forgot?</a>
+        </div>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          class="form-control" 
+          placeholder="••••••••••••" 
+          required 
+          autocomplete="current-password"
+        >
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem; padding: 0.8rem;">
+        Authenticate & Sign In
+      </button>
+    </form>
+
+    <!-- Quick Demo Logins for Instant Testing -->
+    <div class="demo-credentials-box">
+      <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+        Quick Demo Access
+      </div>
+      <div style="color: var(--text-muted); line-height: 1.4; margin-bottom: 0.5rem;">
+        Click below to auto-fill the Chief Compliance Officer credentials:
+      </div>
+      <button 
+        type="button" 
+        class="btn btn-secondary btn-sm" 
+        style="width: 100%; font-size: 0.78rem;"
+        onclick="document.getElementById('email').value='demo@docugovern.com'; document.getElementById('password').value='demo1234';"
+      >
+        Auto-fill Demo Credentials
+      </button>
+    </div>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+      Don't have an enterprise account? 
+      <a href="/register" style="color: var(--primary-600); font-weight: 600;">Register Here</a>
+    </div>
+  </div>
+
+</body>
+</html>
