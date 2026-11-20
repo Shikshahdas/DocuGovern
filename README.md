@@ -15,6 +15,7 @@ A web-based document management and governance platform designed to organize doc
 
 ### Document Upload
 <img width="1913" height="947" alt="Screenshot 2026-11-20 160007 - Copy" src="https://github.com/user-attachments/assets/ca45f90e-b2de-4233-8a05-618f17dc537d" />
+
 ### Approval Workflow
 <img width="1910" height="944" alt="Screenshot 2026-11-20 160034" src="https://github.com/user-attachments/assets/5127e6ef-33f4-4cff-b680-0140e124d58d" />
 
