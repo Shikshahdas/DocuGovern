@@ -4,20 +4,19 @@ A web-based document management and governance platform designed to organize doc
 
 ## Preview
 
+### Login Page
+<img width="1917" height="944" alt="Screenshot 2026-11-20 155904" src="https://github.com/user-attachments/assets/9bf40ecf-95cb-4f42-ae9e-9dc38cd752c4" />
+
 ### Dashboard
-![DocuGovern Dashboard](screenshots/dashboard.png)
+<img width="1912" height="948" alt="Screenshot 2026-11-20 155930 - Copy" src="https://github.com/user-attachments/assets/a064e274-2a7d-486b-92df-e8b49289057e" />
 
 ### Document Repository
-![Document Repository](screenshots/repository.png)
+<img width="1910" height="946" alt="Screenshot 2026-11-20 155950 - Copy" src="https://github.com/user-attachments/assets/beb1d591-a7fd-41d4-86e2-660decb10997" />
 
 ### Document Upload
-![Document Upload](screenshots/upload-document.png)
-
+<img width="1913" height="947" alt="Screenshot 2026-11-20 160007 - Copy" src="https://github.com/user-attachments/assets/ca45f90e-b2de-4233-8a05-618f17dc537d" />
 ### Approval Workflow
-![Approval Workflow](screenshots/approvals.png)
-
-### Activity Logs
-![Activity Logs](screenshots/activity-logs.png)
+<img width="1910" height="944" alt="Screenshot 2026-11-20 160034" src="https://github.com/user-attachments/assets/5127e6ef-33f4-4cff-b680-0140e124d58d" />
 
 ## Key Features
 
